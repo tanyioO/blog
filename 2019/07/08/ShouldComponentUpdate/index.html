@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#fff">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+  
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/blog/images/logo.svg?v=6.4.2" color="#fff">
+
+
+  <link rel="manifest" href="/blog/images/manifest.json">
+
+
+  <meta name="msapplication-config" content="/blog/images/browserconfig.xml" />
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":20,"b2t":true,"scrollpercent":true,"onmobile":true},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"slideLeftIn","post_header":"perspectiveLeftIn","post_body":"perspectiveLeftIn","coll_header":"perspectiveLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="问题在开发一个带有Echarts图表的页面时，每次切换图表类型，都会出现图表反复渲染的问题。通常情况下，页面多次渲染并不会影响用户体验（如果没有动画效果），而在这个页面下Echarts数据填充的动画反复进行多次就会让人明显的感觉到页面在多次刷新，降低用户体验。问题代码如下： 1234567handleChangeDisplayType = e =&amp;gt; &amp;#123;  const &amp;#123">
+<meta name="keywords" content="React生命周期">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用ShouldComponentUpdate避免重复渲染">
+<meta property="og:url" content="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/index.html">
+<meta property="og:site_name" content="tanyioO">
+<meta property="og:description" content="问题在开发一个带有Echarts图表的页面时，每次切换图表类型，都会出现图表反复渲染的问题。通常情况下，页面多次渲染并不会影响用户体验（如果没有动画效果），而在这个页面下Echarts数据填充的动画反复进行多次就会让人明显的感觉到页面在多次刷新，降低用户体验。问题代码如下： 1234567handleChangeDisplayType = e =&amp;gt; &amp;#123;  const &amp;#123">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/react_lifecycle.png">
+<meta property="og:image" content="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/target.png">
+<meta property="og:updated_time" content="2019-07-09T01:55:01.784Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用ShouldComponentUpdate避免重复渲染">
+<meta name="twitter:description" content="问题在开发一个带有Echarts图表的页面时，每次切换图表类型，都会出现图表反复渲染的问题。通常情况下，页面多次渲染并不会影响用户体验（如果没有动画效果），而在这个页面下Echarts数据填充的动画反复进行多次就会让人明显的感觉到页面在多次刷新，降低用户体验。问题代码如下： 1234567handleChangeDisplayType = e =&amp;gt; &amp;#123;  const &amp;#123">
+<meta name="twitter:image" content="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/react_lifecycle.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用ShouldComponentUpdate避免重复渲染 | tanyioO</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tanyioO</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">哦嚯</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/blog/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/blog/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/blog/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/blog/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/blog/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://tanyioo.github.io/blog/blog/2019/07/08/ShouldComponentUpdate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tanyioO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avator.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tanyioO">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用ShouldComponentUpdate避免重复渲染
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-08 09:58:08" itemprop="dateCreated datePublished" datetime="2019-07-08T09:58:08+08:00">2019-07-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-09 09:55:01" itemprop="dateModified" datetime="2019-07-09T09:55:01+08:00">2019-07-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/blog/categories/React/" itemprop="url" rel="index"><span itemprop="name">React</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/blog/2019/07/08/ShouldComponentUpdate/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/blog/2019/07/08/ShouldComponentUpdate/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/blog/2019/07/08/ShouldComponentUpdate/" class="leancloud_visitors" data-flag-title="使用ShouldComponentUpdate避免重复渲染">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p class="description"></p>
+
+<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><p>在开发一个带有Echarts图表的页面时，每次切换图表类型，都会出现图表反复渲染的问题。通常情况下，页面多次渲染并不会影响用户体验（如果没有动画效果），而在这个页面下Echarts数据填充的动画反复进行多次就会让人明显的感觉到页面在多次刷新，降低用户体验。问题代码如下：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">handleChangeDisplayType = <span class="function"><span class="params">e</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; dispatch &#125; = <span class="keyword">this</span>.props;</span><br><span class="line">  <span class="comment">// 获取echarts图表数据</span></span><br><span class="line">  dispatch(&#123; <span class="attr">type</span>: <span class="string">'securitySystem/fetchSpaceAlarmData'</span> &#125;);</span><br><span class="line">  <span class="comment">// 受控组件Button.Group，需手动改变state中的值</span></span><br><span class="line">  <span class="keyword">this</span>.setState(&#123; <span class="attr">displayType</span>: e.target.value &#125;); </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">componentDidUpdate() &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; spaceAlarmData &#125; = <span class="keyword">this</span>.props;</span><br><span class="line">  <span class="keyword">const</span> el = <span class="built_in">document</span>.getElementById(<span class="string">'parking_space_alarm'</span>)</span><br><span class="line">  echarts.dispose(el);</span><br><span class="line">  <span class="keyword">this</span>.parkingSpaceAlarmChart = echarts.init(el);</span><br><span class="line">  <span class="comment">// 渲染图表组件</span></span><br><span class="line">  <span class="keyword">this</span>.renderSpaceAlarmChart(spaceAlarmData, <span class="keyword">this</span>.parkingSpaceAlarmChart);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>页面涉及到多个图表类型之间的切换，所以需要在每次切换时请求数据并手动保存目标图表类型。本以为多次渲染echarts图表的<code>dispose</code>和<code>init</code>同步渲染引起的，在后来仔细了解了React生命周期发现<code>state</code>和<code>props</code>的异步过程不会合并到一次页面渲染，会依次进行。</p>
+<h4 id="页面渲染的触发时机"><a href="#页面渲染的触发时机" class="headerlink" title="页面渲染的触发时机"></a>页面渲染的触发时机</h4><p>页面重新渲染，需要触发React生命周期中的Render函数，以下的React生命周期图可便于理解Render函数是如何被触发的：</p>
+<p><img src="react_lifecycle.png" alt="react_lifecycle"></p>
+<p>这张图将React生命周期分成了三个阶段：生成期、存在期、销毁期。由图可以比较清楚的看出触发Render函数的内容可能包括：</p>
+<ul>
+<li>生成期初次Render</li>
+<li>Props变更</li>
+<li>State变更</li>
+</ul>
+<p>在React的渲染机制中，组件内的某一个props或state变化，会导致该组件内的所有子组件都重写render函数，尽管绝大多数子组件的props没有变化。例如在上面的问题中，受控组件Button.Group和Echarts图表作为页面的子组件，当页面内非自身状态更新时该子组件也会重新渲染。</p>
+<p><img src="target.png" alt="target"></p>
+<p>例如在项目中，点击切换图表类型的主要目的是想设置页面上某一个按钮为选中状态，只需要更新页面上Button.Group中相应的DOM即可。事实上在更新Button组件状态时，还触发了图表组件的Render函数，当父组件中用于填充图表数据的props更新时，再次触发该组件内所有子组件的重绘，因此才会发生问题当中所描述的图表动画加载到一半页面刷新再次触发图表动画的过程。</p>
+<h4 id="使用ShouldComponentUpdate避免重复触发Render函数"><a href="#使用ShouldComponentUpdate避免重复触发Render函数" class="headerlink" title="使用ShouldComponentUpdate避免重复触发Render函数"></a>使用ShouldComponentUpdate避免重复触发Render函数</h4><p><strong>shouldComponentUpdate(nextProps, nextState)</strong></p>
+<p>当 props 或 state 发生变化时，<code>shouldComponentUpdate</code> 会在渲染执行之前被调用。返回值默认为 true。首次渲染(<code>ComponentDidMount</code>前的<code>Render</code>)或使用 <code>forceUpdate</code> 时不会调用该方法。</p>
+<p>手动重写这个函数时，可以将 <code>this.props</code> 与 <code>nextProps</code> 以及 <code>this.state</code> 与<code>nextState</code> 进行比较，并返回<code>true</code>或 <code>false</code> 以告知 React 是否需要跳过更新。需要注意的是，<strong>返回 <code>false</code> 并不会阻止子组件在 state 更改时重新渲染。</strong></p>
+<blockquote>
+<p>这里的子组件是自身还是父组件下的所有子组件还不太清楚。</p>
+<p><a href="https://zh-hans.reactjs.org/docs/react-component.html#shouldcomponentupdate" target="_blank" rel="noopener">官方</a>的解释是：目前，如果 <code>shouldComponentUpdate</code> 返回 <code>false</code>，则不会调用 <a href="https://zh-hans.reactjs.org/docs/react-component.html#unsafe_componentwillupdate" target="_blank" rel="noopener"><code>UNSAFE_componentWillUpdate</code></a>，<a href="https://zh-hans.reactjs.org/docs/react-component.html#render" target="_blank" rel="noopener"><code>render</code></a> 和 <a href="https://zh-hans.reactjs.org/docs/react-component.html#componentdidupdate" target="_blank" rel="noopener"><code>componentDidUpdate</code></a>。后续版本，React 可能会将 <code>shouldComponentUpdate</code> 视为提示而不是严格的指令，并且，当返回 <code>false</code> 时，仍可能导致组件重新渲染。</p>
+<p>官方建议此方法仅作为性能优化的方式而存在。不能依靠此方法来“阻止”渲染，因为这可能会产生 bug，应该考虑使用内置的 PureComponent 组件，而不是手动编写 <code>shouldComponentUpdate</code>。<code>PureComponent</code> 会对 props 和 state 进行浅层比较，并减少了跳过必要更新的可能性。</p>
+</blockquote>
+<p>在项目中遇到的问题暂时可以使用如下方式解决：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">shouldComponentUpdate(nextProps, nextState) &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; displayType &#125; = <span class="keyword">this</span>.state;</span><br><span class="line">  <span class="comment">// 改变state的时候不更新图表组件，改变props的时候更新</span></span><br><span class="line">  <span class="keyword">if</span> (displayType === nextState.displayType) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>React.PureComponent</strong></p>
+<p><code>React.PureComponent</code> 与 <code>React.Component</code> 几乎完全相同，但 <code>React.PureComponent</code> 通过<code>props</code>和<code>state</code>的<strong>浅对比</strong>来实现 <code>shouldComponentUpate</code>。如果对象包含复杂的数据结构，它可能会因深层的数据不一致而产生错误的否定判断(表现为对象深层的数据已改变视图却没有更新）。</p>
+<blockquote>
+<ul>
+<li>无论组件是否是 <code>PureComponent</code>，如果定义了<code>shouldComponentUpdate</code>，那么会调用它并以它的执行结果来判断是否 update。只有在组件未定义 <code>shouldComponentUpdate</code> 的情况下，才会判断该组件是否是 <code>PureComponent</code>。如果是的话，则会对新旧 props、state 进行 <a href="https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js#L39" target="_blank" rel="noopener">shallowEqual</a> 比较。</li>
+<li>浅对比，只会比较到两个对象的 hasOwnProperty 是否符合<code>Object.keys()</code>判等，不会递归地去深层比较。</li>
+</ul>
+</blockquote>
+<p>在项目中，由于图表数据使用嵌套数组的数据结构，无法简单的使用<code>PureComponent</code>来进行优化，如果需要兼顾复杂的数据结构以及较好的用户体验，可以使用第三方库如immutable.js来进行优化，此处不做涉及。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>使用<code>ShouldComponent</code>作为页面性能的一种方式，能够有效的避免页面重复渲染的问题，从而提升用户体验。作为一个不常用的React生命周期钩子，在之前的项目开发中没能很好的理解并运用。希望能通过写文章的方式记录自己学习和了解其原理的过程，加深对于React相关知识的理解。</p>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/blog/tags/React生命周期/" rel="tag"># React生命周期</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2019/06/24/ant-modal/" rel="next" title="ant-modal中forceRender属性及其作用">
+                ant-modal中forceRender属性及其作用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/blog/">
+                <img class="site-author-image" itemprop="image"
+                  src="/blog/uploads/avator.jpg"
+                  alt="tanyioO" />
+			  </a>
+            
+              <p class="site-author-name" itemprop="name">tanyioO</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/blog/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+				  <a href="/blog/categories">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+				  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+				  <a href="/blog/tags">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+				  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/tanyioO" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yi_tan18@163.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-globe"></i>
+                神奇的链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://music.163.com/#/user/home?id=46993336" title="😆 网易云音乐 😆" target="_blank">😆 网易云音乐 😆</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://coldplay.com/" title="Coldplay Official Website" target="_blank">Coldplay Official Website</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#页面渲染的触发时机"><span class="nav-number">2.</span> <span class="nav-text">页面渲染的触发时机</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用ShouldComponentUpdate避免重复触发Render函数"><span class="nav-number">3.</span> <span class="nav-text">使用ShouldComponentUpdate避免重复触发Render函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tanyioO</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a></div>
+
+
+
+  <div class="footer-custom">我，似鸽杀手；我，莫得感情。</div>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery_lazyload@1.9.3/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/blog/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'qp6nNLj7gT9s7G5X559R5Xh9-gzGzoHsz',
+        appKey: 'qvLEMDbA5PU9smxBtn1pgKoK',
+        placeholder: '说点什么吧...',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: true
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: ,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

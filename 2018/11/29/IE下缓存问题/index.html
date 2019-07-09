@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#fff">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+  
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/blog/images/logo.svg?v=6.4.2" color="#fff">
+
+
+  <link rel="manifest" href="/blog/images/manifest.json">
+
+
+  <meta name="msapplication-config" content="/blog/images/browserconfig.xml" />
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":20,"b2t":true,"scrollpercent":true,"onmobile":true},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"slideLeftIn","post_header":"perspectiveLeftIn","post_body":"perspectiveLeftIn","coll_header":"perspectiveLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="什么是浏览器缓存，为什么要使用它？ 缓存游走于服务器和客户端之间。服务器可能是源服务器（存放请求资源的服务器），也可能是反向代理服务器（如 Nginx），数量为 1 个或多个；客户端可能为 PC 端、移动端等，数量也为 1 个或多个。简单的说，缓存用于监控服务器与客户端之间的通信，监控客户端请求，并且把请求输出的内容（如页面、 图片和文件）拷贝一份副本存在本地；然后，如果下一个请求是相同的 U">
+<meta name="keywords" content="浏览器缓存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IE下GET请求缓存问题及解决方案">
+<meta property="og:url" content="https://tanyioo.github.io/blog/2018/11/29/IE下缓存问题/index.html">
+<meta property="og:site_name" content="tanyioO">
+<meta property="og:description" content="什么是浏览器缓存，为什么要使用它？ 缓存游走于服务器和客户端之间。服务器可能是源服务器（存放请求资源的服务器），也可能是反向代理服务器（如 Nginx），数量为 1 个或多个；客户端可能为 PC 端、移动端等，数量也为 1 个或多个。简单的说，缓存用于监控服务器与客户端之间的通信，监控客户端请求，并且把请求输出的内容（如页面、 图片和文件）拷贝一份副本存在本地；然后，如果下一个请求是相同的 U">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://tanyioo.github.io/blog/uploads/cache.png">
+<meta property="og:updated_time" content="2019-07-09T01:55:01.781Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IE下GET请求缓存问题及解决方案">
+<meta name="twitter:description" content="什么是浏览器缓存，为什么要使用它？ 缓存游走于服务器和客户端之间。服务器可能是源服务器（存放请求资源的服务器），也可能是反向代理服务器（如 Nginx），数量为 1 个或多个；客户端可能为 PC 端、移动端等，数量也为 1 个或多个。简单的说，缓存用于监控服务器与客户端之间的通信，监控客户端请求，并且把请求输出的内容（如页面、 图片和文件）拷贝一份副本存在本地；然后，如果下一个请求是相同的 U">
+<meta name="twitter:image" content="https://tanyioo.github.io/blog/uploads/cache.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://tanyioo.github.io/blog/2018/11/29/IE下缓存问题/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>IE下GET请求缓存问题及解决方案 | tanyioO</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tanyioO</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">哦嚯</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/blog/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/blog/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/blog/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/blog/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/blog/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://tanyioo.github.io/blog/blog/2018/11/29/IE下缓存问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tanyioO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avator.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tanyioO">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">IE下GET请求缓存问题及解决方案
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-29 14:21:53" itemprop="dateCreated datePublished" datetime="2018-11-29T14:21:53+08:00">2018-11-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-09 09:55:01" itemprop="dateModified" datetime="2019-07-09T09:55:01+08:00">2019-07-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/blog/categories/Web/" itemprop="url" rel="index"><span itemprop="name">Web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/blog/2018/11/29/IE下缓存问题/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/blog/2018/11/29/IE下缓存问题/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/blog/2018/11/29/IE下缓存问题/" class="leancloud_visitors" data-flag-title="IE下GET请求缓存问题及解决方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p class="description"></p>
+
+<h4 id="什么是浏览器缓存，为什么要使用它？"><a href="#什么是浏览器缓存，为什么要使用它？" class="headerlink" title="什么是浏览器缓存，为什么要使用它？"></a>什么是浏览器缓存，为什么要使用它？</h4><p> 缓存游走于服务器和客户端之间。服务器可能是源服务器（存放请求资源的服务器），也可能是反向代理服务器（如 Nginx），数量为 1 个或多个；客户端可能为 PC 端、移动端等，数量也为 1 个或多个。简单的说，缓存用于监控服务器与客户端之间的通信，监控客户端请求，并且把请求输出的内容（如页面、 图片和文件）拷贝一份副本存在本地；然后，如果下一个请求是相同的 URL，则直接请求保存的副本，而不用再次向服务器获取。</p>
+<a id="more"></a>
+<p>使用缓存的 3 个主要原因：</p>
+<ul>
+<li>提升访问速度：缓存离客户端更近，因此，从缓存请求数据比从服务器所用时间更少，显著地提高了网站的访问速度。</li>
+<li>减少网络带宽消耗：副本被重复使用，降低请求次数，从而减少网络流量，节省运营成本。</li>
+<li>降低服务器压力：给网络资源设定有效期之后，用户可以重复使用本地的缓存，减少对源服务器的请求，间接降低服务器的压力</li>
+</ul>
+<h4 id="浏览器缓存规则"><a href="#浏览器缓存规则" class="headerlink" title="浏览器缓存规则"></a>浏览器缓存规则</h4><p> 对于浏览器端的缓存来讲，这些规则是在 HTTP 协议头和 HTML 页面的 Meta 标签中定义的，分别<strong>新鲜度</strong>和<strong>校验值</strong>两个维度来确定浏览器是以直接使用缓存中的副本，还是需要去源服务器获取更新的版本。</p>
+<ul>
+<li><p>新鲜度（过期机制）：也就是缓存副本有效期。一个缓存副本必须满足以下条件，浏览器会认为它是有效的：</p>
+<blockquote>
+<p>(1) 含有完整的过期时间控制头信息（HTTP 协议报头），并且仍在有效期内；<br>(2) 浏览器已经使用过这个缓存副本，并且在首次请求中已经检查过有效性（非首次请求）；</p>
+</blockquote>
+<p>满足以上两个情况的一种，浏览器会直接从缓存中获取副本并渲染。</p>
+</li>
+<li><p>校验值（验证机制）：服务器返回资源的时候有时在控制头信息带上这个资源的实体标签 Etag（Entity Tag），它可以用来作为浏览器再次请求过程的校验标识。如过发现校验标识不匹配，说明资源已经被修改或过期，服务器需重新返回资源内容。</p>
+</li>
+</ul>
+<p>浏览器请求流程图如下：</p>
+<p><img src="https://tanyioo.github.io/blog/uploads/cache.png" alt="pad" style="width:70%;height:70%"></p>
+<blockquote>
+<p>请求本地缓存过后，浏览器会向服务端发起请求，协商是否使用缓存，如果上一次的缓存中有 Last-modified 和 Etag 字段，浏览器将在 request header 中加入 If-Modified-Since（对应于 Last-modified）， 和 If-None-Match（对应于 Etag）。</p>
+</blockquote>
+<p> 两个概念：</p>
+<ul>
+<li>强缓存：用户发送的请求，直接从客户端缓存中获取，不发送请求到服务器，不与服务器发生交互行为</li>
+<li><p>协商缓存：用户发送的请求，发送到服务器后，由服务器判定是否从缓存中获取资源</p>
+<p>两者共同点是客户端获得的数据最后都是从客户端缓存中获得。区别在于强缓存不与服务器交互，而协商缓存则需要与服务器交互。</p>
+</li>
+</ul>
+<h4 id="IE-浏览器下的缓存问题"><a href="#IE-浏览器下的缓存问题" class="headerlink" title="IE 浏览器下的缓存问题"></a>IE 浏览器下的缓存问题</h4><p>IE 浏览器会缓存网页中的 GET 和 XHR 的内容，并且在 IE 浏览器中如果请求方式是 GET 的话，IE 浏览器会对其进行标识，如果该 GET 请求的 URL 是第一次请求的话，会请求相关服务器，从数据库中获取数据；而如果该 GETt 请求的 URL 不是第一次请求的话，IE 浏览器会直接从缓存副本中拿到上次该 URL 获取的数据。并且无论是形式封装的 GET 方式请求，IE 浏览器都会这样进行处理的。这对于实时性有要求的数据不适用，产生网页中的数据与数据库的数据不同步的现象。</p>
+<h4 id="几种解决上述问题的方法"><a href="#几种解决上述问题的方法" class="headerlink" title="几种解决上述问题的方法"></a>几种解决上述问题的方法</h4><p>(1) GET 参数中添加一个随机数或当前时间戳的参数</p>
+<p>保证每次 URL 请求唯一性，迫使每个 GET 请求都是一次新请求，这种方式虽然能解决 IE 始终返回 304 的问题，但实际上每个 request 都会去请求服务器，对 web 优化并非最佳的解决方案。</p>
+<p>(2) 请求方式修改为 post 方法</p>
+<p> 这种做法不符合 RESTful web API 设计，同时这种方式也会每次请求服务器，没有真正利用到 IE 的缓存机制。</p>
+<p>(3) 在 HTML 页面设置 Meta 标签</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Cache-Control"</span> <span class="attr">content</span>=<span class="string">"no-store"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Pragma"</span> <span class="attr">content</span>=<span class="string">"no-cache"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p> 这种禁用缓存的形式用处很有限：仅有 IE 才能识别这段 meta 标签含义，其它主流浏览器仅识别“Cache-Control: no-store”的 meta 标签；在 IE 中识别到该 meta 标签含义，只能保证请求当前 HTML 页面时每次都发新请求，网页上的资源则不受影响；因浏览器不同或者同一浏览器间版本不同，此方法存在很大的兼容性问题。</p>
+<p>(4) 使用缓存有关的 HTTP 消息报头控制（协商缓存）</p>
+<ul>
+<li><p><strong>Cache-Control 与 Expires</strong></p>
+<p> Cache-Control 与 Expires 的作用一致，都是指明当前资源的有效期，控制浏览器是否直接从浏览器缓存取数据还是重新发请求到服务器取数据。相比较 Cache-Control 的选择更多，设置更细致，如同时设置，其优先级高于 Expires。</p>
+</li>
+<li><p><strong>Last-Modified/ETag 与 Cache-Control/Expires</strong></p>
+<p> 配置 Last-Modified/ETag 的情况下，浏览器再次访问该 URI 的资源，仍会发送请求到服务器询问文件是否已经修改。如未修改，服务器会只发送一个 304 回给浏览器，告诉浏览器直接从本地的缓存取数据；如已修改就返回修改过的数据。</p>
+<p> Cache-Control/Expires 则不同，如果检测到本地的缓存还是有效的时间范围内，浏览器会直接使用本地副本，不会发送任何请求。两者一起使用时，Cache-Control/Expires 的优先级要高于 Last-Modified/ETag。</p>
+<p> 一般情况下，使用 Cache-Control/Expires 会配合 Last-Modified/ETag 一起使用，因为即使服务器设置缓存时间, 当用户点击“刷新”按钮时，浏览器会忽略缓存继续向服务器发送请求，这时 Last-Modified/ETag 将能够很好利用 304，从而减少响应开销。</p>
+</li>
+<li><p><strong>Last-Modified 与 ETag</strong></p>
+<p> Etag（实体标识）的出现主要是为了解决几个 Last-Modified 比较难解决的问题：首先，Last-Modified 标注的最后修改只能精确到秒级，如果某些文件在 1 秒钟以内，被修改多次的话，它将不能准确标注文件的新鲜度。其次，如果某些文件会被定期生成，当有时内容并没有任何变化，但 Last-Modified 却改变了，导致文件没法使用缓存。</p>
+<p> Etag 是服务器自动生成或者由开发者生成的对应资源在服务器端的唯一标识符，能够更加准确的控制缓存。Last-Modified 与 ETag 一起使用时，服务器会优先验证 ETag，一致的情况下，才会继续比对 Last-Modified，最后才决定是否返回 304。</p>
+</li>
+</ul>
+<h4 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h4><p> <a href="https://www.cnblogs.com/shixiaomiao1122/p/7591556.html" target="_blank" rel="noopener">彻底理解浏览器缓存机制</a></p>
+<p> <a href="https://www.cnblogs.com/slly/p/6732749.html" target="_blank" rel="noopener">浏览器缓存机制详解</a></p>
+<p> <a href="https://blog.csdn.net/xiaoping0915/article/details/79145234" target="_blank" rel="noopener">IE 浏览器 GET 请求缓存问题</a></p>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/blog/tags/浏览器缓存/" rel="tag"># 浏览器缓存</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2019/06/21/JSONAndString/" rel="prev" title="JSON序列化与嵌套字符串中引号的转义">
+                <i class="fa fa-chevron-left"></i> JSON序列化与嵌套字符串中引号的转义
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2018/10/13/Initial Test/" rel="next" title="Blog Testing">
+                Blog Testing <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/blog/">
+                <img class="site-author-image" itemprop="image"
+                  src="/blog/uploads/avator.jpg"
+                  alt="tanyioO" />
+			  </a>
+            
+              <p class="site-author-name" itemprop="name">tanyioO</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/blog/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+				  <a href="/blog/categories">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+				  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+				  <a href="/blog/tags">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+				  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/tanyioO" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yi_tan18@163.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-globe"></i>
+                神奇的链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://music.163.com/#/user/home?id=46993336" title="😆 网易云音乐 😆" target="_blank">😆 网易云音乐 😆</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://coldplay.com/" title="Coldplay Official Website" target="_blank">Coldplay Official Website</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是浏览器缓存，为什么要使用它？"><span class="nav-number">1.</span> <span class="nav-text">什么是浏览器缓存，为什么要使用它？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#浏览器缓存规则"><span class="nav-number">2.</span> <span class="nav-text">浏览器缓存规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#IE-浏览器下的缓存问题"><span class="nav-number">3.</span> <span class="nav-text">IE 浏览器下的缓存问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#几种解决上述问题的方法"><span class="nav-number">4.</span> <span class="nav-text">几种解决上述问题的方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考文献"><span class="nav-number">5.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tanyioO</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a></div>
+
+
+
+  <div class="footer-custom">我，似鸽杀手；我，莫得感情。</div>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery_lazyload@1.9.3/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/blog/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'qp6nNLj7gT9s7G5X559R5Xh9-gzGzoHsz',
+        appKey: 'qvLEMDbA5PU9smxBtn1pgKoK',
+        placeholder: '说点什么吧...',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: true
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: ,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

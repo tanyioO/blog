@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[使用ShouldComponentUpdate避免重复渲染]]></title>
+    <url>%2Fblog%2F2019%2F07%2F08%2FShouldComponentUpdate%2F</url>
+    <content type="text"><![CDATA[问题在开发一个带有Echarts图表的页面时，每次切换图表类型，都会出现图表反复渲染的问题。通常情况下，页面多次渲染并不会影响用户体验（如果没有动画效果），而在这个页面下Echarts数据填充的动画反复进行多次就会让人明显的感觉到页面在多次刷新，降低用户体验。问题代码如下： 1234567handleChangeDisplayType = e =&gt; &#123; const &#123; dispatch &#125; = this.props; // 获取echarts图表数据 dispatch(&#123; type: 'securitySystem/fetchSpaceAlarmData' &#125;); // 受控组件Button.Group，需手动改变state中的值 this.setState(&#123; displayType: e.target.value &#125;); &#125;; 12345678componentDidUpdate() &#123; const &#123; spaceAlarmData &#125; = this.props; const el = document.getElementById('parking_space_alarm') echarts.dispose(el); this.parkingSpaceAlarmChart = echarts.init(el); // 渲染图表组件 this.renderSpaceAlarmChart(spaceAlarmData, this.parkingSpaceAlarmChart);&#125; 页面涉及到多个图表类型之间的切换，所以需要在每次切换时请求数据并手动保存目标图表类型。本以为多次渲染echarts图表的dispose和init同步渲染引起的，在后来仔细了解了React生命周期发现state和props的异步过程不会合并到一次页面渲染，会依次进行。 页面渲染的触发时机页面重新渲染，需要触发React生命周期中的Render函数，以下的React生命周期图可便于理解Render函数是如何被触发的： 这张图将React生命周期分成了三个阶段：生成期、存在期、销毁期。由图可以比较清楚的看出触发Render函数的内容可能包括： 生成期初次Render Props变更 State变更 在React的渲染机制中，组件内的某一个props或state变化，会导致该组件内的所有子组件都重写render函数，尽管绝大多数子组件的props没有变化。例如在上面的问题中，受控组件Button.Group和Echarts图表作为页面的子组件，当页面内非自身状态更新时该子组件也会重新渲染。 例如在项目中，点击切换图表类型的主要目的是想设置页面上某一个按钮为选中状态，只需要更新页面上Button.Group中相应的DOM即可。事实上在更新Button组件状态时，还触发了图表组件的Render函数，当父组件中用于填充图表数据的props更新时，再次触发该组件内所有子组件的重绘，因此才会发生问题当中所描述的图表动画加载到一半页面刷新再次触发图表动画的过程。 使用ShouldComponentUpdate避免重复触发Render函数shouldComponentUpdate(nextProps, nextState) 当 props 或 state 发生变化时，shouldComponentUpdate 会在渲染执行之前被调用。返回值默认为 true。首次渲染(ComponentDidMount前的Render)或使用 forceUpdate 时不会调用该方法。 手动重写这个函数时，可以将 this.props 与 nextProps 以及 this.state 与nextState 进行比较，并返回true或 false 以告知 React 是否需要跳过更新。需要注意的是，返回 false 并不会阻止子组件在 state 更改时重新渲染。 这里的子组件是自身还是父组件下的所有子组件还不太清楚。 官方的解释是：目前，如果 shouldComponentUpdate 返回 false，则不会调用 UNSAFE_componentWillUpdate，render 和 componentDidUpdate。后续版本，React 可能会将 shouldComponentUpdate 视为提示而不是严格的指令，并且，当返回 false 时，仍可能导致组件重新渲染。 官方建议此方法仅作为性能优化的方式而存在。不能依靠此方法来“阻止”渲染，因为这可能会产生 bug，应该考虑使用内置的 PureComponent 组件，而不是手动编写 shouldComponentUpdate。PureComponent 会对 props 和 state 进行浅层比较，并减少了跳过必要更新的可能性。 在项目中遇到的问题暂时可以使用如下方式解决： 12345678shouldComponentUpdate(nextProps, nextState) &#123; const &#123; displayType &#125; = this.state; // 改变state的时候不更新图表组件，改变props的时候更新 if (displayType === nextState.displayType) &#123; return true; &#125; return false;&#125; React.PureComponent React.PureComponent 与 React.Component 几乎完全相同，但 React.PureComponent 通过props和state的浅对比来实现 shouldComponentUpate。如果对象包含复杂的数据结构，它可能会因深层的数据不一致而产生错误的否定判断(表现为对象深层的数据已改变视图却没有更新）。 无论组件是否是 PureComponent，如果定义了shouldComponentUpdate，那么会调用它并以它的执行结果来判断是否 update。只有在组件未定义 shouldComponentUpdate 的情况下，才会判断该组件是否是 PureComponent。如果是的话，则会对新旧 props、state 进行 shallowEqual 比较。 浅对比，只会比较到两个对象的 hasOwnProperty 是否符合Object.keys()判等，不会递归地去深层比较。 在项目中，由于图表数据使用嵌套数组的数据结构，无法简单的使用PureComponent来进行优化，如果需要兼顾复杂的数据结构以及较好的用户体验，可以使用第三方库如immutable.js来进行优化，此处不做涉及。 总结使用ShouldComponent作为页面性能的一种方式，能够有效的避免页面重复渲染的问题，从而提升用户体验。作为一个不常用的React生命周期钩子，在之前的项目开发中没能很好的理解并运用。希望能通过写文章的方式记录自己学习和了解其原理的过程，加深对于React相关知识的理解。]]></content>
+      <categories>
+        <category>React</category>
+      </categories>
+      <tags>
+        <tag>React生命周期</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[ant-modal中forceRender属性及其作用]]></title>
+    <url>%2Fblog%2F2019%2F06%2F24%2Fant-modal%2F</url>
+    <content type="text"><![CDATA[ant-modal/forceRender以下是ant design对于对话框的使用场景介绍：需要用户处理事务，又不希望跳转页面以致打断工作流程时，可以使用 modal 在当前页面正中打开一个浮层，承载相应的操作。对话框可细分成两类：模态对话框和非模态对话框。模态对话框会阻断应用程序，如果出现，直到对话框关闭，则其是应用程序当前唯一活动的东西；非模态对话框不会阻断应用程序，因此同时可以有多个非模态的对话框被激活。ant-modal是其组件库中的模态对话框，与之类似如bootstrap-modal也是模态对话框。 ant-modal属性forceRender属性的主要作用是：无论modal是隐藏或者显示，都会强制性的将modal渲染到DOM中，以满足在实际开发过程中的一些需求，例如：在进入modal前，提前获取到模态框中的DOM元素，作为图片加载容器，从而解决在网络环境较差时打开modal图片加载缓慢的问题。 强制渲染 or not？在我所使用的一些”历史比较悠久”的UI组件库如bootstrap，layUI中，对于modal的处理是将其作为一个绝对定位元素渲染到DOM中，设置它的CSS display属性用于控制其显示和隐藏。这种方式在现在的”数据驱动“式开发中存在很多问题，例如： 首屏加载问题：数据量较大或者页面中的modal个数比较多时，可能会导致页面加载缓慢 数据“残留”：当modal中存在表单时，由于modal不销毁，再次打开modal时，表单中的数据为上一次修改的数据，需要手动清除或重置表单 未写完…]]></content>
+      <categories>
+        <category>UI组件库</category>
+      </categories>
+      <tags>
+        <tag>ant-modal</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[JSON序列化与嵌套字符串中引号的转义]]></title>
+    <url>%2Fblog%2F2019%2F06%2F21%2FJSONAndString%2F</url>
+    <content type="text"><![CDATA[问题如果需要发给后台一个标准的JSON数组，通常情况下使用JSON.stringify()对数组进行序列化即可，如果数组比较简单，也可以使用引号手动拼接。在项目开发过程中遇到过这样一个问题，在手动拼接JSON数组后，经过umi-request的自动序列化与反序列化，最终发送的请求参数却不是一个可识别的标准JSON数组，而是一个字符串。主要原因在于：对嵌套字符串进行序列化和反序列化时，有可能会将字符串中的引号进行转义，如果拼接的字符串格式不正确，就会出现无法转义的情况，最终只能得到一个字符串而不是JSON数组。 字符串中的单/双引号在讨论上面的问题前，先看一字符串的单引号和双引号的区别。在JavaScript中单引号和双引号可以同时使用，混合使用时要遵循一定的准则： 双引号&quot;&quot;中可以嵌套单引号&#39;&#39; 单引号&#39;&#39;中可以嵌套双引号&quot;&quot; 双引号中也可以嵌套双引号，但必须使用转义\&quot; 单引号中也可以嵌套单引号，但必须使用转义\&#39; 1234567var a = 'JavaScript "is" awesome'; var b = "JavaScript 'is' awesome";var c = "JavaScript \"is\" awesome";var d = "JavaScript "is" awesome"; // Uncaught SyntaxError: Unexpected identifiervar e = 'JavaScript \'is\' awesome'; var f = 'JavaScript 'is' awesome'; // Uncaught SyntaxError: Unexpected identifiervar g = "J\"a\'v\'\"aScript \'is\' awesome"; // "J"a'v'"aScript 'is' awesome" 理论上来说，不同类型引号之间可以通过转义无限嵌套，但由于可读性太差，一般不建议这么做。 JSON序列化和反序列化时出现的问题回到一开始在项目中遇到的问题，如果使用嵌套字符串手动拼接JSON数组，应该如何使用？ 12345// 单引号内嵌套双引号dispatch(&#123; type: 'camera/fetchCameraGroups', payload: '["salvo"]',&#125;); 这个结果正好是想要的标准json数组。 换另外一种形式，在双引号内嵌套单引号 12345// 双引号内嵌套单引号dispatch(&#123; type: 'camera/fetchCameraGroups', payload: "['salvo']",&#125;); request payload则是： 从结果上看来，请求参数是一个JSON字符串而不是JSON数组。 通过上面讲述的字符串嵌套规则，在两种方式都支持的情况下，出现问题的原因应该在于umi-request的JSON自动序列化与反序列化中的某一过程。 部分猜测及验证根据以上猜测，直接使用JSON.stringify()和JSON.parse()进行验证： 12345var a = JSON.stringify('["salvo"]'); // ""[\"salvo\"]""JSON.parse(a); // "["salvo"]"var b = JSON.stringify("['salvo']"); // ""['salvo']""JSON.parse(b); // "['salvo']" 以上可以看出，JSON序列化&#39;[&quot;salvo&quot;]&#39;时，首先将内层的双引号转义，然后将外层的单引号序列化为双引号，以便反序列化时正确解析；在序列化&quot;[&#39;salvo&#39;]&quot;时，由于内层使用单引号不符合标准的JSON数组格式，因此没有对其进行转义或者其他处理，然后将双引号包裹的内容当成了一个完整的字符串。至于在序列化和反序列化时，解析内外层的顺序，使用umi内置的格式化标准以及prettier工具验证如下： 123"[\"salvo\"]” // '["salvo"]''[\'salvo\']' // "['salvo']" 可以看出prettier在格式化时，会以内层的引号类型为准，然后在外层采用不同的类型。 结论及疑问JSON序列化与反序列化时，遵循的是ECMA262的相关标准，在操作嵌套字符串时是根据JavaScript来具体实现的。因此在使用字符串拼接JSON数组时，不仅要符合字符串的嵌套规则，更要遵循JSON的标准数据格式。 当然，为防止这种问题的出现，应当直接使用JSON.stringify()创建JSON数组，避免偷懒直接使用字符串进行拼接。 疑问在于：从结果上看，JSON的序列化/反序列化与嵌套字符串使用prettier格式化后的效果是相同的，至于是不是对于相同标准的不同实现，我暂时还没有找到相关的资料并验证。]]></content>
+      <categories>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>JSON序列化</tag>
+        <tag>嵌套字符串的转义</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[IE下GET请求缓存问题及解决方案]]></title>
+    <url>%2Fblog%2F2018%2F11%2F29%2FIE%E4%B8%8B%E7%BC%93%E5%AD%98%E9%97%AE%E9%A2%98%2F</url>
+    <content type="text"><![CDATA[什么是浏览器缓存，为什么要使用它？ 缓存游走于服务器和客户端之间。服务器可能是源服务器（存放请求资源的服务器），也可能是反向代理服务器（如 Nginx），数量为 1 个或多个；客户端可能为 PC 端、移动端等，数量也为 1 个或多个。简单的说，缓存用于监控服务器与客户端之间的通信，监控客户端请求，并且把请求输出的内容（如页面、 图片和文件）拷贝一份副本存在本地；然后，如果下一个请求是相同的 URL，则直接请求保存的副本，而不用再次向服务器获取。 使用缓存的 3 个主要原因： 提升访问速度：缓存离客户端更近，因此，从缓存请求数据比从服务器所用时间更少，显著地提高了网站的访问速度。 减少网络带宽消耗：副本被重复使用，降低请求次数，从而减少网络流量，节省运营成本。 降低服务器压力：给网络资源设定有效期之后，用户可以重复使用本地的缓存，减少对源服务器的请求，间接降低服务器的压力 浏览器缓存规则 对于浏览器端的缓存来讲，这些规则是在 HTTP 协议头和 HTML 页面的 Meta 标签中定义的，分别新鲜度和校验值两个维度来确定浏览器是以直接使用缓存中的副本，还是需要去源服务器获取更新的版本。 新鲜度（过期机制）：也就是缓存副本有效期。一个缓存副本必须满足以下条件，浏览器会认为它是有效的： (1) 含有完整的过期时间控制头信息（HTTP 协议报头），并且仍在有效期内；(2) 浏览器已经使用过这个缓存副本，并且在首次请求中已经检查过有效性（非首次请求）； 满足以上两个情况的一种，浏览器会直接从缓存中获取副本并渲染。 校验值（验证机制）：服务器返回资源的时候有时在控制头信息带上这个资源的实体标签 Etag（Entity Tag），它可以用来作为浏览器再次请求过程的校验标识。如过发现校验标识不匹配，说明资源已经被修改或过期，服务器需重新返回资源内容。 浏览器请求流程图如下： 请求本地缓存过后，浏览器会向服务端发起请求，协商是否使用缓存，如果上一次的缓存中有 Last-modified 和 Etag 字段，浏览器将在 request header 中加入 If-Modified-Since（对应于 Last-modified）， 和 If-None-Match（对应于 Etag）。 两个概念： 强缓存：用户发送的请求，直接从客户端缓存中获取，不发送请求到服务器，不与服务器发生交互行为 协商缓存：用户发送的请求，发送到服务器后，由服务器判定是否从缓存中获取资源 两者共同点是客户端获得的数据最后都是从客户端缓存中获得。区别在于强缓存不与服务器交互，而协商缓存则需要与服务器交互。 IE 浏览器下的缓存问题IE 浏览器会缓存网页中的 GET 和 XHR 的内容，并且在 IE 浏览器中如果请求方式是 GET 的话，IE 浏览器会对其进行标识，如果该 GET 请求的 URL 是第一次请求的话，会请求相关服务器，从数据库中获取数据；而如果该 GETt 请求的 URL 不是第一次请求的话，IE 浏览器会直接从缓存副本中拿到上次该 URL 获取的数据。并且无论是形式封装的 GET 方式请求，IE 浏览器都会这样进行处理的。这对于实时性有要求的数据不适用，产生网页中的数据与数据库的数据不同步的现象。 几种解决上述问题的方法(1) GET 参数中添加一个随机数或当前时间戳的参数 保证每次 URL 请求唯一性，迫使每个 GET 请求都是一次新请求，这种方式虽然能解决 IE 始终返回 304 的问题，但实际上每个 request 都会去请求服务器，对 web 优化并非最佳的解决方案。 (2) 请求方式修改为 post 方法 这种做法不符合 RESTful web API 设计，同时这种方式也会每次请求服务器，没有真正利用到 IE 的缓存机制。 (3) 在 HTML 页面设置 Meta 标签 12&lt;meta http-equiv="Cache-Control" content="no-store" /&gt;&lt;meta http-equiv="Pragma" content="no-cache" /&gt; 这种禁用缓存的形式用处很有限：仅有 IE 才能识别这段 meta 标签含义，其它主流浏览器仅识别“Cache-Control: no-store”的 meta 标签；在 IE 中识别到该 meta 标签含义，只能保证请求当前 HTML 页面时每次都发新请求，网页上的资源则不受影响；因浏览器不同或者同一浏览器间版本不同，此方法存在很大的兼容性问题。 (4) 使用缓存有关的 HTTP 消息报头控制（协商缓存） Cache-Control 与 Expires Cache-Control 与 Expires 的作用一致，都是指明当前资源的有效期，控制浏览器是否直接从浏览器缓存取数据还是重新发请求到服务器取数据。相比较 Cache-Control 的选择更多，设置更细致，如同时设置，其优先级高于 Expires。 Last-Modified/ETag 与 Cache-Control/Expires 配置 Last-Modified/ETag 的情况下，浏览器再次访问该 URI 的资源，仍会发送请求到服务器询问文件是否已经修改。如未修改，服务器会只发送一个 304 回给浏览器，告诉浏览器直接从本地的缓存取数据；如已修改就返回修改过的数据。 Cache-Control/Expires 则不同，如果检测到本地的缓存还是有效的时间范围内，浏览器会直接使用本地副本，不会发送任何请求。两者一起使用时，Cache-Control/Expires 的优先级要高于 Last-Modified/ETag。 一般情况下，使用 Cache-Control/Expires 会配合 Last-Modified/ETag 一起使用，因为即使服务器设置缓存时间, 当用户点击“刷新”按钮时，浏览器会忽略缓存继续向服务器发送请求，这时 Last-Modified/ETag 将能够很好利用 304，从而减少响应开销。 Last-Modified 与 ETag Etag（实体标识）的出现主要是为了解决几个 Last-Modified 比较难解决的问题：首先，Last-Modified 标注的最后修改只能精确到秒级，如果某些文件在 1 秒钟以内，被修改多次的话，它将不能准确标注文件的新鲜度。其次，如果某些文件会被定期生成，当有时内容并没有任何变化，但 Last-Modified 却改变了，导致文件没法使用缓存。 Etag 是服务器自动生成或者由开发者生成的对应资源在服务器端的唯一标识符，能够更加准确的控制缓存。Last-Modified 与 ETag 一起使用时，服务器会优先验证 ETag，一致的情况下，才会继续比对 Last-Modified，最后才决定是否返回 304。 参考文献 彻底理解浏览器缓存机制 浏览器缓存机制详解 IE 浏览器 GET 请求缓存问题]]></content>
+      <categories>
+        <category>Web</category>
+      </categories>
+      <tags>
+        <tag>浏览器缓存</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Blog Testing]]></title>
+    <url>%2Fblog%2F2018%2F10%2F13%2FInitial%20Test%2F</url>
+    <content type="text"><![CDATA[Shared mutable state is the root of all evil –Pete Hunt]]></content>
+  </entry>
+</search>
