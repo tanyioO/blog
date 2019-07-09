@@ -101,4 +101,4 @@ theme: next
 deploy:
   type: git
   repo: git@github.com:tanyioO/blog.git
-  branch: master
+  branch: gh-pages
