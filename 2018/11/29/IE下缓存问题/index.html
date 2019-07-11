@@ -160,12 +160,12 @@
 <meta property="og:site_name" content="tanyioO">
 <meta property="og:description" content="什么是浏览器缓存，为什么要使用它？ 缓存游走于服务器和客户端之间。服务器可能是源服务器（存放请求资源的服务器），也可能是反向代理服务器（如 Nginx），数量为 1 个或多个；客户端可能为 PC 端、移动端等，数量也为 1 个或多个。简单的说，缓存用于监控服务器与客户端之间的通信，监控客户端请求，并且把请求输出的内容（如页面、 图片和文件）拷贝一份副本存在本地；然后，如果下一个请求是相同的 U">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://tanyioo.github.io/blog/uploads/cache.png">
-<meta property="og:updated_time" content="2019-07-09T01:55:01.781Z">
+<meta property="og:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/ie/cache.png">
+<meta property="og:updated_time" content="2019-07-11T01:47:38.949Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="IE下GET请求缓存问题及解决方案">
 <meta name="twitter:description" content="什么是浏览器缓存，为什么要使用它？ 缓存游走于服务器和客户端之间。服务器可能是源服务器（存放请求资源的服务器），也可能是反向代理服务器（如 Nginx），数量为 1 个或多个；客户端可能为 PC 端、移动端等，数量也为 1 个或多个。简单的说，缓存用于监控服务器与客户端之间的通信，监控客户端请求，并且把请求输出的内容（如页面、 图片和文件）拷贝一份副本存在本地；然后，如果下一个请求是相同的 U">
-<meta name="twitter:image" content="https://tanyioo.github.io/blog/uploads/cache.png">
+<meta name="twitter:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/ie/cache.png">
 
 
 
@@ -414,7 +414,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-09 09:55:01" itemprop="dateModified" datetime="2019-07-09T09:55:01+08:00">2019-07-09</time>
+                <time title="修改时间：2019-07-11 09:47:38" itemprop="dateModified" datetime="2019-07-11T09:47:38+08:00">2019-07-11</time>
               
             
           </span>
@@ -508,7 +508,7 @@
 </li>
 </ul>
 <p>浏览器请求流程图如下：</p>
-<p><img src="https://tanyioo.github.io/blog/uploads/cache.png" alt="pad" style="width:70%;height:70%"></p>
+<p><img src="https://github.com/tanyioO/image-lib/raw/master/blog/ie/cache.png" alt="cache"></p>
 <blockquote>
 <p>请求本地缓存过后，浏览器会向服务端发起请求，协商是否使用缓存，如果上一次的缓存中有 Last-modified 和 Etag 字段，浏览器将在 request header 中加入 If-Modified-Since（对应于 Last-modified）， 和 If-None-Match（对应于 Etag）。</p>
 </blockquote>
