@@ -37,7 +37,7 @@ image:
 
 浏览器请求流程图如下：
 
-<img src="https://tanyioo.github.io/blog/uploads/cache.png" alt="pad" style="width:70%;height:70%" />
+![cache](https://github.com/tanyioO/image-lib/raw/master/blog/ie/cache.png)
 
 > 请求本地缓存过后，浏览器会向服务端发起请求，协商是否使用缓存，如果上一次的缓存中有 Last-modified 和 Etag 字段，浏览器将在 request header 中加入 If-Modified-Since（对应于 Last-modified）， 和 If-None-Match（对应于 Etag）。
 

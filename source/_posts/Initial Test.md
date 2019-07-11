@@ -9,7 +9,7 @@ image:
 ---
 <p class="description"> Shared mutable state is the root of all evil  --Pete Hunt</p>
 
-<img src="https://tanyioo.github.io/blog/uploads/hexo-next-optimization-title.jpg" alt="picture" style="width:100%" />
+![test](https://github.com/tanyioO/image-lib/raw/master/blog/initialTest/test.jpg)
 
 <!-- more -->
 
