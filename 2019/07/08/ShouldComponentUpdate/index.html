@@ -160,13 +160,13 @@
 <meta property="og:site_name" content="tanyioO">
 <meta property="og:description" content="问题在开发一个带有Echarts图表的页面时，每次切换图表类型，都会出现图表反复渲染的问题。通常情况下，页面多次渲染并不会影响用户体验（如果没有动画效果），而在这个页面下Echarts数据填充的动画反复进行多次就会让人明显的感觉到页面在多次刷新，降低用户体验。问题代码如下： 1234567handleChangeDisplayType = e =&amp;gt; &amp;#123;  const &amp;#123">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/react_lifecycle.png">
-<meta property="og:image" content="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/target.png">
-<meta property="og:updated_time" content="2019-07-09T01:55:01.784Z">
+<meta property="og:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/shouldComponentUpdate/react_lifecycle.png">
+<meta property="og:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/shouldComponentUpdate/target.png">
+<meta property="og:updated_time" content="2019-07-11T01:08:28.197Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用ShouldComponentUpdate避免重复渲染">
 <meta name="twitter:description" content="问题在开发一个带有Echarts图表的页面时，每次切换图表类型，都会出现图表反复渲染的问题。通常情况下，页面多次渲染并不会影响用户体验（如果没有动画效果），而在这个页面下Echarts数据填充的动画反复进行多次就会让人明显的感觉到页面在多次刷新，降低用户体验。问题代码如下： 1234567handleChangeDisplayType = e =&amp;gt; &amp;#123;  const &amp;#123">
-<meta name="twitter:image" content="https://tanyioo.github.io/blog/2019/07/08/ShouldComponentUpdate/react_lifecycle.png">
+<meta name="twitter:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/shouldComponentUpdate/react_lifecycle.png">
 
 
 
@@ -415,7 +415,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-09 09:55:01" itemprop="dateModified" datetime="2019-07-09T09:55:01+08:00">2019-07-09</time>
+                <time title="修改时间：2019-07-11 09:08:28" itemprop="dateModified" datetime="2019-07-11T09:08:28+08:00">2019-07-11</time>
               
             
           </span>
@@ -495,7 +495,7 @@
 <a id="more"></a>
 <p>页面涉及到多个图表类型之间的切换，所以需要在每次切换时请求数据并手动保存目标图表类型。本以为多次渲染echarts图表的<code>dispose</code>和<code>init</code>同步渲染引起的，在后来仔细了解了React生命周期发现<code>state</code>和<code>props</code>的异步过程不会合并到一次页面渲染，会依次进行。</p>
 <h4 id="页面渲染的触发时机"><a href="#页面渲染的触发时机" class="headerlink" title="页面渲染的触发时机"></a>页面渲染的触发时机</h4><p>页面重新渲染，需要触发React生命周期中的Render函数，以下的React生命周期图可便于理解Render函数是如何被触发的：</p>
-<p><img src="react_lifecycle.png" alt="react_lifecycle"></p>
+<p><img src="https://github.com/tanyioO/image-lib/raw/master/blog/shouldComponentUpdate/react_lifecycle.png" alt="react_lifecycle"></p>
 <p>这张图将React生命周期分成了三个阶段：生成期、存在期、销毁期。由图可以比较清楚的看出触发Render函数的内容可能包括：</p>
 <ul>
 <li>生成期初次Render</li>
@@ -503,7 +503,7 @@
 <li>State变更</li>
 </ul>
 <p>在React的渲染机制中，组件内的某一个props或state变化，会导致该组件内的所有子组件都重写render函数，尽管绝大多数子组件的props没有变化。例如在上面的问题中，受控组件Button.Group和Echarts图表作为页面的子组件，当页面内非自身状态更新时该子组件也会重新渲染。</p>
-<p><img src="target.png" alt="target"></p>
+<p><img src="https://github.com/tanyioO/image-lib/raw/master/blog/shouldComponentUpdate/target.png" alt="target"></p>
 <p>例如在项目中，点击切换图表类型的主要目的是想设置页面上某一个按钮为选中状态，只需要更新页面上Button.Group中相应的DOM即可。事实上在更新Button组件状态时，还触发了图表组件的Render函数，当父组件中用于填充图表数据的props更新时，再次触发该组件内所有子组件的重绘，因此才会发生问题当中所描述的图表动画加载到一半页面刷新再次触发图表动画的过程。</p>
 <h4 id="使用ShouldComponentUpdate避免重复触发Render函数"><a href="#使用ShouldComponentUpdate避免重复触发Render函数" class="headerlink" title="使用ShouldComponentUpdate避免重复触发Render函数"></a>使用ShouldComponentUpdate避免重复触发Render函数</h4><p><strong>shouldComponentUpdate(nextProps, nextState)</strong></p>
 <p>当 props 或 state 发生变化时，<code>shouldComponentUpdate</code> 会在渲染执行之前被调用。返回值默认为 true。首次渲染(<code>ComponentDidMount</code>前的<code>Render</code>)或使用 <code>forceUpdate</code> 时不会调用该方法。</p>

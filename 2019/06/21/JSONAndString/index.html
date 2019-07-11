@@ -160,13 +160,13 @@
 <meta property="og:site_name" content="tanyioO">
 <meta property="og:description" content="问题如果需要发给后台一个标准的JSON数组，通常情况下使用JSON.stringify()对数组进行序列化即可，如果数组比较简单，也可以使用引号手动拼接。在项目开发过程中遇到过这样一个问题，在手动拼接JSON数组后，经过umi-request的自动序列化与反序列化，最终发送的请求参数却不是一个可识别的标准JSON数组，而是一个字符串。主要原因在于：对嵌套字符串进行序列化和反序列化时，有可能会将">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://tanyioo.github.io/blog/2019/06/21/JSONAndString/request1.png">
-<meta property="og:image" content="https://tanyioo.github.io/blog/2019/06/21/JSONAndString/request2.png">
-<meta property="og:updated_time" content="2019-07-09T01:55:01.782Z">
+<meta property="og:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/JSONAndString/request1.png">
+<meta property="og:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/JSONAndString/request2.png">
+<meta property="og:updated_time" content="2019-07-11T01:03:59.097Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JSON序列化与嵌套字符串中引号的转义">
 <meta name="twitter:description" content="问题如果需要发给后台一个标准的JSON数组，通常情况下使用JSON.stringify()对数组进行序列化即可，如果数组比较简单，也可以使用引号手动拼接。在项目开发过程中遇到过这样一个问题，在手动拼接JSON数组后，经过umi-request的自动序列化与反序列化，最终发送的请求参数却不是一个可识别的标准JSON数组，而是一个字符串。主要原因在于：对嵌套字符串进行序列化和反序列化时，有可能会将">
-<meta name="twitter:image" content="https://tanyioo.github.io/blog/2019/06/21/JSONAndString/request1.png">
+<meta name="twitter:image" content="https://github.com/tanyioO/image-lib/raw/master/blog/JSONAndString/request1.png">
 
 
 
@@ -415,7 +415,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-09 09:55:01" itemprop="dateModified" datetime="2019-07-09T09:55:01+08:00">2019-07-09</time>
+                <time title="修改时间：2019-07-11 09:03:59" itemprop="dateModified" datetime="2019-07-11T09:03:59+08:00">2019-07-11</time>
               
             
           </span>
@@ -502,12 +502,12 @@
 <p>理论上来说，不同类型引号之间可以通过转义无限嵌套，但由于可读性太差，一般不建议这么做。</p>
 <h4 id="JSON序列化和反序列化时出现的问题"><a href="#JSON序列化和反序列化时出现的问题" class="headerlink" title="JSON序列化和反序列化时出现的问题"></a>JSON序列化和反序列化时出现的问题</h4><p>回到一开始在项目中遇到的问题，如果使用嵌套字符串手动拼接<code>JSON数组</code>，应该如何使用？</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单引号内嵌套双引号</span></span><br><span class="line">dispatch(&#123;</span><br><span class="line">  type: <span class="string">'camera/fetchCameraGroups'</span>,</span><br><span class="line">  payload: <span class="string">'["salvo"]'</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p><img src="request1.png" alt="request"></p>
+<p><img src="https://github.com/tanyioO/image-lib/raw/master/blog/JSONAndString/request1.png" alt="request"></p>
 <p>这个结果正好是想要的标准<code>json数组</code>。</p>
 <p>换另外一种形式，在双引号内嵌套单引号</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 双引号内嵌套单引号</span></span><br><span class="line">dispatch(&#123;</span><br><span class="line">  type: <span class="string">'camera/fetchCameraGroups'</span>,</span><br><span class="line">  payload: <span class="string">"['salvo']"</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>request payload则是：</p>
-<p><img src="request2.png" alt="request"></p>
+<p><img src="https://github.com/tanyioO/image-lib/raw/master/blog/JSONAndString/request2.png" alt="request"></p>
 <p>从结果上看来，请求参数是一个<code>JSON字符串</code>而不是<code>JSON数组</code>。</p>
 <p>通过上面讲述的字符串嵌套规则，在两种方式都支持的情况下，出现问题的原因应该在于umi-request的JSON自动序列化与反序列化中的某一过程。</p>
 <h4 id="部分猜测及验证"><a href="#部分猜测及验证" class="headerlink" title="部分猜测及验证"></a>部分猜测及验证</h4><p>根据以上猜测，直接使用<code>JSON.stringify()</code>和<code>JSON.parse()</code>进行验证：</p>
