@@ -6,7 +6,7 @@
   <link href="/blog/atom.xml" rel="self"/>
   
   <link href="https://tanyioo.github.io/blog/"/>
-  <updated>2019-07-11T01:08:28.197Z</updated>
+  <updated>2019-07-11T06:39:08.739Z</updated>
   <id>https://tanyioo.github.io/blog/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HEXO项目中文章图片上传的几种方式</title>
+    <link href="https://tanyioo.github.io/blog/2019/07/11/imgUploads/"/>
+    <id>https://tanyioo.github.io/blog/2019/07/11/imgUploads/</id>
+    <published>2019-07-11T02:06:08.000Z</published>
+    <updated>2019-07-11T06:39:08.739Z</updated>
+    
+    <content type="html"><![CDATA[<p class="description"></p><h4 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h4><p>近期对博客进行了一些小小的改动，包括git提交记录的规范化、分支管理、文章图片上传方式调整等等。其中文章图片上传的方式改动了多次，主要目的在于提高图片分类、替换、管理的效率，以及能够在文章中更方便自由地引用。</p><h4 id="文章中使用图片的几种方式"><a href="#文章中使用图片的几种方式" class="headerlink" title="文章中使用图片的几种方式"></a>文章中使用图片的几种方式</h4><p><strong>1、在themes/next/source路径下创建图片文件</strong></p><p>这是最开始使用的图片上传方式，主要利用的是hexo generate生成静态文件时会将source路径下的新建立的图片文件原样打包到根目录下的public文件中，而public文件中的内容实际上就是push到github pages上的静态博客的内容，所以只需在在文章中使用文章到图片文件的相对路径即可引用图片。步骤如下：</p><a id="more"></a><ul><li><p>在themes/next/source路径下创建uploads文件夹（文件名任意），添加需要的图片文件</p></li><li><p>在文章中引入图片前先使用hexo generate编译静态文件（这样做的目的是方便根据目录结构得到相对路径，熟悉静态文件结构以后可以跳过这一步）</p><blockquote><p>使用hexo generate生成博客静态文件时，生成的目录结构按照”年\月\日\文章文件名\index.html”形式逐级深入，如：public\2019\07\08\ShouldComponentUpdate\index.html</p></blockquote></li><li><p>在文章中使用相对路径引入图片</p><blockquote><p>自定义的图片文件uploads位于public目录下，因此相对路径就为：”../../../../../uploads/xxx.png”</p></blockquote></li></ul><p>这种使用方式类似于webpack项目中将静态文件放入public文件，可以不经过编译。缺点在于本地编辑时markdown文档中无法预览，并且书写相对路径时容易出错。只建议在Hexo项目中只有少量图片时使用。</p><p><strong>2、使用Hexo文章资源文件</strong></p><p>如果想要实现文章的模块化管理，Hexo官方提供了一种组织化的方式。开启相关配置后通过 <code>hexo new [layout] &lt;title&gt;</code> 命令创建新文章时会自动创建一个与这个 markdown 文件一样的名字资源文件夹。经过编译以后，资源文件夹中的图片会与index.html处于同一目录下，因此在使用相对路径引入时更加方便。使用步骤如下：</p><ul><li><p>配置Hexo静态资源文件选项，设置post_asset_folder为true</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// _config.yml</span></span><br><span class="line">post_asset_folder: <span class="literal">true</span></span><br></pre></td></tr></table></figure></li><li><p>生成新文章的同时生成文章资源文件夹，在文件夹内添加图片</p></li><li>在文章中使用相对路径引入图片（因为与index.html在同一目录下，相对路径更好书写，如：./xxx.png）</li></ul><p>对比第一种方式，使用文章资源文件的好处在于文章及其资源实现了就近原则，方便管理的同时也减少了引用时相对路径的书写难度。</p><p><strong>3、使用github作为图床</strong></p><p>图床，是一个专门储存图片的仓库，同时允许为图片仓库地址创建连接作为URL。</p><p>这里使用的图床是以raw形式上传图片至github，操作步骤如下：</p><ul><li><p>创建图床仓库</p></li><li><p>本地克隆仓库，添加所需图片然后push到仓库中</p></li><li><p>在github仓库中打开图片，复制链接</p><blockquote><p>例如：<code>https://github.com/tanyioO/image-lib/blob/master/blog/img/xxx.png</code></p></blockquote></li><li><p>将链接中的”blob”改成”raw”后，在markdown文档中使用</p></li></ul><p>除了使用github作为图床，还可以使用自建服务器，七牛云等云储存对象等，各有优缺点。</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p class=&quot;description&quot;&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;写在前面&quot;&gt;&lt;a href=&quot;#写在前面&quot; class=&quot;headerlink&quot; title=&quot;写在前面&quot;&gt;&lt;/a&gt;写在前面&lt;/h4&gt;&lt;p&gt;近期对博客进行了一些小小的改动，包括git提交记录的规范化、分支管理、文章图片上传方式调整等等。其中文章图片上传的方式改动了多次，主要目的在于提高图片分类、替换、管理的效率，以及能够在文章中更方便自由地引用。&lt;/p&gt;
+&lt;h4 id=&quot;文章中使用图片的几种方式&quot;&gt;&lt;a href=&quot;#文章中使用图片的几种方式&quot; class=&quot;headerlink&quot; title=&quot;文章中使用图片的几种方式&quot;&gt;&lt;/a&gt;文章中使用图片的几种方式&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;1、在themes/next/source路径下创建图片文件&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这是最开始使用的图片上传方式，主要利用的是hexo generate生成静态文件时会将source路径下的新建立的图片文件原样打包到根目录下的public文件中，而public文件中的内容实际上就是push到github pages上的静态博客的内容，所以只需在在文章中使用文章到图片文件的相对路径即可引用图片。步骤如下：&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="其他" scheme="https://tanyioo.github.io/blog/categories/%E5%85%B6%E4%BB%96/"/>
+    
+    
+      <category term="markdown中使用图片" scheme="https://tanyioo.github.io/blog/tags/markdown%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%9B%BE%E7%89%87/"/>
+    
+  </entry>
   
   <entry>
     <title>使用ShouldComponentUpdate避免重复渲染</title>
