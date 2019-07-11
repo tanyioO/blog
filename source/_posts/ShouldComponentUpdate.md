@@ -42,7 +42,7 @@ image:
 
 页面重新渲染，需要触发React生命周期中的Render函数，以下的React生命周期图可便于理解Render函数是如何被触发的：
 
-![react_lifecycle](react_lifecycle.png)
+![react_lifecycle](https://github.com/tanyioO/image-lib/raw/master/blog/shouldComponentUpdate/react_lifecycle.png)
 
 这张图将React生命周期分成了三个阶段：生成期、存在期、销毁期。由图可以比较清楚的看出触发Render函数的内容可能包括：
 
@@ -52,7 +52,7 @@ image:
 
 在React的渲染机制中，组件内的某一个props或state变化，会导致该组件内的所有子组件都重写render函数，尽管绝大多数子组件的props没有变化。例如在上面的问题中，受控组件Button.Group和Echarts图表作为页面的子组件，当页面内非自身状态更新时该子组件也会重新渲染。
 
-![target](target.png)
+![target](https://github.com/tanyioO/image-lib/raw/master/blog/shouldComponentUpdate/target.png)
 
 例如在项目中，点击切换图表类型的主要目的是想设置页面上某一个按钮为选中状态，只需要更新页面上Button.Group中相应的DOM即可。事实上在更新Button组件状态时，还触发了图表组件的Render函数，当父组件中用于填充图表数据的props更新时，再次触发该组件内所有子组件的重绘，因此才会发生问题当中所描述的图表动画加载到一半页面刷新再次触发图表动画的过程。
 

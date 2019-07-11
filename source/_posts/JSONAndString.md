@@ -50,7 +50,7 @@ dispatch({
 });
 ```
 
-![request](request1.png)
+![request](https://github.com/tanyioO/image-lib/raw/master/blog/JSONAndString/request1.png)
 
 这个结果正好是想要的标准`json数组`。
 
@@ -66,7 +66,7 @@ dispatch({
 
 request payload则是：
 
-![request](request2.png)
+![request](https://github.com/tanyioO/image-lib/raw/master/blog/JSONAndString/request2.png)
 
 从结果上看来，请求参数是一个`JSON字符串`而不是`JSON数组`。
 
